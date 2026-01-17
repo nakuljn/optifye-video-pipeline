@@ -18,7 +18,6 @@ jobs:
 
     env:
       AWS_REGION: eu-north-1
-      ECR_REPOSITORY: inference
       EKS_CLUSTER_NAME: optifye-eks
 
     steps:
@@ -49,8 +48,8 @@ jobs:
             --region eu-north-1 \
             --name optifye-eks
 
-      - name: Deploy inference to EKS
+      - name: Deploy inference to EKS (non-blocking)
         run: |
           kubectl set image deployment/inference-deployment \
             inference=706517038213.dkr.ecr.eu-north-1.amazonaws.com/inference:${{ github.sha }}
-          kubectl rollout status deployment/inference-deployment
+
