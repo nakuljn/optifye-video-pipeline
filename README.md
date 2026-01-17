@@ -42,23 +42,3 @@ CI/CD is implemented using **GitHub Actions** with **OIDC-based AWS authenticati
 - Performs rolling updates on EKS
 
 No static AWS credentials are stored in the repository.
-
----
-
-## Repository Structure
-consumer/     # Kafka consumer
-producer/     # Kafka producer
-inference/    # Inference service (EKS)
-k8s/          # Kubernetes manifests
-msk-infra/    # Kafka infrastructure
-
-
----
-
-## Key Highlights
-
-- Stateless, scalable inference service
-- Autoscaling driven by real workload metrics
-- Production-grade CI/CD pipeline
-- Secure, cloud-native authentication
-
