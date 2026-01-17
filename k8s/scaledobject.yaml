@@ -1,0 +1,23 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: inference-kafka-lag-scaler
+spec:
+  scaleTargetRef:
+    name: inference-deployment
+
+  minReplicaCount: 1
+  maxReplicaCount: 5
+
+  pollingInterval: 15
+  cooldownPeriod: 60
+
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus.default.svc.cluster.local:9090
+        metricName: kafka_consumer_lag
+        threshold: "5"
+        query: |
+          kafka_consumer_lag
+

@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv
+.env
+
+# Media / artifacts
+media/
+*.mp4
+*.jpg
+*.png
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+
+# Kubernetes local state
+.kube/
+
+# Editor
+.vscode/
+.idea/
