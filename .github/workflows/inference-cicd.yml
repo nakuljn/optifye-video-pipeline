@@ -1,0 +1,56 @@
+name: CI/CD - Inference Service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - inference/**
+      - k8s/**
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    env:
+      AWS_REGION: eu-north-1
+      ECR_REPOSITORY: inference
+      EKS_CLUSTER_NAME: optifye-eks
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::706517038213:role/github-actions-role
+          aws-region: eu-north-1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./inference
+          push: true
+          tags: |
+            706517038213.dkr.ecr.eu-north-1.amazonaws.com/inference:latest
+            706517038213.dkr.ecr.eu-north-1.amazonaws.com/inference:${{ github.sha }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region eu-north-1 \
+            --name optifye-eks
+
+      - name: Deploy inference to EKS
+        run: |
+          kubectl set image deployment/inference-deployment \
+            inference=706517038213.dkr.ecr.eu-north-1.amazonaws.com/inference:${{ github.sha }}
+          kubectl rollout status deployment/inference-deployment
