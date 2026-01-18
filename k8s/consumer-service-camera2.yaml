@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: consumer-camera2-service
+spec:
+  selector:
+    app: consumer
+    stream: camera2
+  ports:
+    - port: 8002
+      targetPort: 8002
+      name: metrics

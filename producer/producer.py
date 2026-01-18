@@ -1,19 +1,23 @@
+import os
 import cv2
 import time
 import pickle
 import numpy as np
 from kafka import KafkaProducer
 
-# 1. Configuration - Use 9092 for Plaintext to avoid SSL Timeout issues
-KAFKA_BROKERS = [
-    "b-1.videopipeline.mgvvii.c2.kafka.eu-north-1.amazonaws.com:9094",
-    "b-2.videopipeline.mgvvii.c2.kafka.eu-north-1.amazonaws.com:9094",
-    "b-3.videopipeline.mgvvii.c2.kafka.eu-north-1.amazonaws.com:9094",
-]
+# ---------- STREAM CONFIGURATION ----------
+STREAM_ID = os.environ.get("STREAM_ID", "camera1")
 
-TOPIC = "video.camera1"
-RTSP_URL = "rtsp://localhost:8554/cam"
-BATCH_SIZE = 25
+KAFKA_BROKERS = os.environ.get(
+    "KAFKA_BROKERS",
+    "b-1.videopipeline.mgvvii.c2.kafka.eu-north-1.amazonaws.com:9094,"
+    "b-2.videopipeline.mgvvii.c2.kafka.eu-north-1.amazonaws.com:9094,"
+    "b-3.videopipeline.mgvvii.c2.kafka.eu-north-1.amazonaws.com:9094"
+).split(",")
+
+TOPIC = os.environ.get("KAFKA_TOPIC", "video.camera1")
+RTSP_URL = os.environ.get("RTSP_URL", "rtsp://localhost:8554/cam")
+BATCH_SIZE = int(os.environ.get("BATCH_SIZE", "25"))
 
 # 2. Update the producer initialization
 producer = KafkaProducer(
@@ -33,7 +37,7 @@ def get_rtsp_stream(url):
 cap = get_rtsp_stream(RTSP_URL)
 batch = []
 
-print("Starting RTSP → Kafka producer")
+print(f"Starting RTSP → Kafka producer for {STREAM_ID}")
 
 try:
     cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)

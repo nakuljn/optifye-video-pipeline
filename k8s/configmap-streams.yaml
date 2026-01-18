@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: streams-config
+data:
+  KAFKA_BROKERS: "b-1.videopipeline.mgvvii.c2.kafka.eu-north-1.amazonaws.com:9094,b-2.videopipeline.mgvvii.c2.kafka.eu-north-1.amazonaws.com:9094,b-3.videopipeline.mgvvii.c2.kafka.eu-north-1.amazonaws.com:9094"
+  INFERENCE_URL: "http://inference-service:8000/infer"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: camera1-config
+data:
+  STREAM_ID: "camera1"
+  KAFKA_TOPIC: "video.camera1"
+  KAFKA_GROUP_ID: "video-consumer-group-camera1"
+  S3_BUCKET: "optifye-inference-results"
+  S3_PREFIX: "annotated"
+  METRICS_PORT: "8001"
+  RTSP_URL: "rtsp://localhost:8554/cam"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: camera2-config
+data:
+  STREAM_ID: "camera2"
+  KAFKA_TOPIC: "video.camera2"
+  KAFKA_GROUP_ID: "video-consumer-group-camera2"
+  S3_BUCKET: "optifye-inference-results"
+  S3_PREFIX: "annotated-camera2"
+  METRICS_PORT: "8002"
+  RTSP_URL: "rtsp://localhost:8554/cam2"

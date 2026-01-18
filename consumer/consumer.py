@@ -1,3 +1,4 @@
+import os
 import time
 import pickle
 import logging
@@ -9,24 +10,29 @@ import numpy as np
 from confluent_kafka import Consumer, TopicPartition
 from prometheus_client import Gauge, start_http_server
 
-# ---------------- CONFIG ----------------
+# ---------------- STREAM CONFIGURATION ----------------
 
-KAFKA_BROKERS = (
+STREAM_ID = os.environ.get("STREAM_ID", "camera1")
+
+KAFKA_BROKERS = os.environ.get(
+    "KAFKA_BROKERS",
     "b-1.videopipeline.mgvvii.c2.kafka.eu-north-1.amazonaws.com:9094,"
     "b-2.videopipeline.mgvvii.c2.kafka.eu-north-1.amazonaws.com:9094,"
     "b-3.videopipeline.mgvvii.c2.kafka.eu-north-1.amazonaws.com:9094"
 )
 
-KAFKA_TOPIC = "video.camera1"
-KAFKA_GROUP_ID = "video-consumer-group"
+KAFKA_TOPIC = os.environ.get("KAFKA_TOPIC", "video.camera1")
+KAFKA_GROUP_ID = os.environ.get("KAFKA_GROUP_ID", "video-consumer-group")
 
-INFERENCE_URL = (
+INFERENCE_URL = os.environ.get(
+    "INFERENCE_URL",
     "http://ab85a96ee32bb4edb981d3dd99f5d9c3-166869099."
     "eu-north-1.elb.amazonaws.com/infer"
 )
 
-S3_BUCKET = "optifye-inference-results"
-S3_PREFIX = "annotated"
+S3_BUCKET = os.environ.get("S3_BUCKET", "optifye-inference-results")
+S3_PREFIX = os.environ.get("S3_PREFIX", "annotated")
+METRICS_PORT = int(os.environ.get("METRICS_PORT", "8001"))
 
 # ---------------- LOGGING ----------------
 
@@ -42,11 +48,12 @@ s3 = boto3.client("s3")
 
 # ---------------- PROMETHEUS ----------------
 
-start_http_server(8001)
+start_http_server(METRICS_PORT)
 
 kafka_lag_gauge = Gauge(
     "kafka_consumer_lag",
-    "Kafka consumer lag (high watermark - committed offset)"
+    "Kafka consumer lag (high watermark - committed offset)",
+    ["stream_id"]
 )
 
 # ---------------- KAFKA CONSUMER ----------------
@@ -62,7 +69,7 @@ consumer_conf = {
 consumer = Consumer(consumer_conf)
 consumer.subscribe([KAFKA_TOPIC])
 
-logger.info("🟢 Confluent Kafka consumer started")
+logger.info(f"🟢 Confluent Kafka consumer started for {STREAM_ID}")
 
 # ---------------- HELPERS ----------------
 
@@ -130,8 +137,8 @@ try:
 
         # ----- Kafka lag -----
         lag = compute_kafka_lag(consumer, msg)
-        kafka_lag_gauge.set(lag)
-        logger.info(f"📊 Kafka lag: {lag}")
+        kafka_lag_gauge.labels(stream_id=STREAM_ID).set(lag)
+        logger.info(f"📊 Kafka lag for {STREAM_ID}: {lag}")
 
         # ----- Inference -----
         response = requests.post(

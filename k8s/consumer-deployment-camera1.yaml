@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer-camera1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumer
+      stream: camera1
+  template:
+    metadata:
+      labels:
+        app: consumer
+        stream: camera1
+    spec:
+      containers:
+      - name: consumer
+        image: 706517038213.dkr.ecr.eu-north-1.amazonaws.com/consumer-service:latest
+        ports:
+        - containerPort: 8001
+        envFrom:
+        - configMapRef:
+            name: streams-config
+        - configMapRef:
+            name: camera1-config
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"

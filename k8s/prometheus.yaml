@@ -11,7 +11,8 @@ data:
       - job_name: kafka-consumer-lag
         static_configs:
           - targets:
-              - 13.48.56.90:8001
+              - consumer-camera1-service:8001
+              - consumer-camera2-service:8002
 ---
 apiVersion: apps/v1
 kind: Deployment

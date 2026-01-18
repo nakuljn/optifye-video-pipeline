@@ -1,0 +1,30 @@
+{
+  "streams": {
+    "camera1": {
+      "rtsp_url": "rtsp://localhost:8554/cam",
+      "kafka_topic": "video.camera1",
+      "consumer_group": "video-consumer-group-camera1",
+      "s3_bucket": "optifye-inference-results",
+      "s3_prefix": "annotated",
+      "metrics_port": 8001
+    },
+    "camera2": {
+      "rtsp_url": "rtsp://localhost:8554/cam2",
+      "kafka_topic": "video.camera2",
+      "consumer_group": "video-consumer-group-camera2",
+      "s3_bucket": "optifye-inference-results",
+      "s3_prefix": "annotated-camera2",
+      "metrics_port": 8002
+    }
+  },
+  "kafka": {
+    "brokers": [
+      "b-1.videopipeline.mgvvii.c2.kafka.eu-north-1.amazonaws.com:9094",
+      "b-2.videopipeline.mgvvii.c2.kafka.eu-north-1.amazonaws.com:9094",
+      "b-3.videopipeline.mgvvii.c2.kafka.eu-north-1.amazonaws.com:9094"
+    ]
+  },
+  "inference": {
+    "url": "http://ab85a96ee32bb4edb981d3dd99f5d9c3-166869099.eu-north-1.elb.amazonaws.com/infer"
+  }
+}
