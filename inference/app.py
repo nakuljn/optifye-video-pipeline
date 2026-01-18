@@ -18,7 +18,8 @@ def infer(payload: dict):
 
     frames = payload.get("frames", [])
     logger.info(f"Received inference request with {len(frames)} frames")
-
+    
+    #Store results in a list
     results = []
 
     for i in range(len(frames)):
